@@ -36,4 +36,10 @@ const isStoreOwner = (req, res, next) => {
     return res.status(403).json({ message: 'Access denied: Store Owners only' });
 };
 
-module.exports = { protect, isAdmin, isStoreOwner };
+// Only allows USER role (used for actions like submitting ratings)
+const isUser = (req, res, next) => {
+    if (req.user?.role === 'USER') return next();
+    return res.status(403).json({ message: 'Access denied: Users only' });
+};
+
+module.exports = { protect, isAdmin, isStoreOwner, isUser };

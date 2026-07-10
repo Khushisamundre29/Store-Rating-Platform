@@ -126,3 +126,79 @@ exports.getUserByIdByAdmin = async (req, res) => {
         res.status(500).json({ message: 'Server error while fetching user details' });
     }
 };
+
+// Admin updates an existing user's name, email, address, and/or role.
+// Password is intentionally not editable here — that flow belongs to the
+// user's own "change password" action, not an admin overwrite.
+exports.updateUserByAdmin = async (req, res) => {
+    const { id } = req.params;
+    const { name, email, address, role } = req.body;
+
+    if (!name || !email || !address || !role) {
+        return res.status(400).json({ message: 'Please provide name, email, address, and role.' });
+    }
+    if (name.length < 20 || name.length > 60) {
+        return res.status(400).json({ message: 'Name must be between 20 and 60 characters.' });
+    }
+    if (address.length > 400) {
+        return res.status(400).json({ message: 'Address must not exceed 400 characters.' });
+    }
+    const normalizedRole = role.toUpperCase();
+    if (!['ADMIN', 'USER', 'STORE_OWNER'].includes(normalizedRole)) {
+        return res.status(400).json({ message: 'Invalid role. Must be ADMIN, USER, or STORE_OWNER.' });
+    }
+
+    try {
+        const [existing] = await db.query('SELECT id FROM users WHERE id = ?', [id]);
+        if (existing.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const [emailTaken] = await db.query('SELECT id FROM users WHERE email = ? AND id != ?', [email, id]);
+        if (emailTaken.length > 0) {
+            return res.status(400).json({ message: 'Another user with this email already exists.' });
+        }
+
+        await db.query(
+            'UPDATE users SET name = ?, email = ?, address = ?, role = ? WHERE id = ?',
+            [name, email, address, normalizedRole, id]
+        );
+
+        res.json({ message: 'User updated successfully.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error while updating user.' });
+    }
+};
+
+// Admin deletes a user. Blocked if the user owns a store, so a store is
+// never left pointing at a non-existent owner.
+exports.deleteUserByAdmin = async (req, res) => {
+    const { id } = req.params;
+
+    if (String(req.user.id) === String(id)) {
+        return res.status(400).json({ message: 'You cannot delete your own account.' });
+    }
+
+    try {
+        const [existing] = await db.query('SELECT id FROM users WHERE id = ?', [id]);
+        if (existing.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const [ownedStores] = await db.query('SELECT id FROM stores WHERE owner_id = ?', [id]);
+        if (ownedStores.length > 0) {
+            return res.status(400).json({ message: 'This user owns a store. Reassign or delete the store first.' });
+        }
+
+        await db.query('DELETE FROM ratings WHERE user_id = ?', [id]);
+        await db.query('DELETE FROM users WHERE id = ?', [id]);
+
+        res.json({ message: 'User deleted successfully.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error while deleting user.' });
+    }
+};

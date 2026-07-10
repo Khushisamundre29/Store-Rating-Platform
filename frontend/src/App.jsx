@@ -1,11 +1,13 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import AdminDashboard from './pages/AdminDashboard';
 import UserDashboard from './pages/UserDashboard';
 import StoreOwnerDashboard from './pages/StoreOwnerDashboard';
+import StoreDetailsPage from './pages/StoreDetailsPage';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
     const { user, token, loading } = useAuth();
@@ -36,6 +38,7 @@ const PublicRoute = ({ children }) => {
 function App() {
     return (
         <Routes>
+            <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
             <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
             <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
             <Route path="/dashboard" element={<DashboardRedirect />} />
@@ -46,8 +49,8 @@ function App() {
             <Route path="/user/password" element={<ProtectedRoute allowedRoles={['USER']}><UserDashboard /></ProtectedRoute>} />
             <Route path="/store-owner" element={<ProtectedRoute allowedRoles={['STORE_OWNER']}><StoreOwnerDashboard /></ProtectedRoute>} />
             <Route path="/store-owner/password" element={<ProtectedRoute allowedRoles={['STORE_OWNER']}><StoreOwnerDashboard /></ProtectedRoute>} />
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="/stores/:storeId" element={<ProtectedRoute><StoreDetailsPage /></ProtectedRoute>} />
+            <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     );
 }

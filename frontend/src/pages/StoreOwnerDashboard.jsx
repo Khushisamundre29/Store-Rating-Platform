@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
-import Sidebar from '../components/layout/Header';
+import { useDebouncedValue } from '../hooks/useDebounce';
+import Sidebar from '../components/layout/Sidebar';
+import { IconSearch, IconStar, IconUsers, IconAlert, IconCheck, IconChevronUp, IconChevronDown, IconChevronUpDown } from '../components/icons/Icons';
 
 const SortableHeader = ({ label, field, sort, onSort }) => {
     const active = sort.field === field;
@@ -8,10 +10,24 @@ const SortableHeader = ({ label, field, sort, onSort }) => {
         <th className={`sortable ${active ? (sort.dir === 'asc' ? 'sort-asc' : 'sort-desc') : ''}`}
             onClick={() => onSort(field)}>
             {label}
-            <span className="sort-icon">{active ? (sort.dir === 'asc' ? '↑' : '↓') : '↕'}</span>
+            <span className="sort-icon">
+                {active ? (sort.dir === 'asc' ? <IconChevronUp /> : <IconChevronDown />) : <IconChevronUpDown />}
+            </span>
         </th>
     );
 };
+
+const SkeletonRows = ({ cols, rows = 4 }) => (
+    <>
+        {Array.from({ length: rows }).map((_, r) => (
+            <tr key={r}>
+                {Array.from({ length: cols }).map((__, c) => (
+                    <td key={c}><div className="skeleton" style={{ height: '14px', width: c === 0 ? '70%' : '85%' }} /></td>
+                ))}
+            </tr>
+        ))}
+    </>
+);
 
 const ChangePasswordSection = ({ api }) => {
     const [form, setForm] = useState({ current: '', newPw: '', confirm: '' });
@@ -44,22 +60,22 @@ const ChangePasswordSection = ({ api }) => {
 
     return (
         <div className="password-section">
-            <h3 style={{marginBottom:'1.25rem', fontSize:'1.05rem'}}>Change Password</h3>
+            <h3 style={{ marginBottom: '1.25rem', fontSize: '1.05rem' }}>Change Password</h3>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label>Current Password</label>
-                    <input type="password" value={form.current} onChange={e => setForm(f=>({...f,current:e.target.value}))} required disabled={loading} />
+                    <input type="password" value={form.current} onChange={e => setForm(f => ({ ...f, current: e.target.value }))} required disabled={loading} />
                 </div>
                 <div className="form-group">
                     <label>New Password</label>
-                    <input type="password" placeholder="8–16 chars, 1 uppercase, 1 special" value={form.newPw} onChange={e => setForm(f=>({...f,newPw:e.target.value}))} required disabled={loading} />
+                    <input type="password" placeholder="8–16 chars, 1 uppercase, 1 special" value={form.newPw} onChange={e => setForm(f => ({ ...f, newPw: e.target.value }))} required disabled={loading} />
                 </div>
                 <div className="form-group">
                     <label>Confirm New Password</label>
-                    <input type="password" value={form.confirm} onChange={e => setForm(f=>({...f,confirm:e.target.value}))} required disabled={loading} />
+                    <input type="password" value={form.confirm} onChange={e => setForm(f => ({ ...f, confirm: e.target.value }))} required disabled={loading} />
                 </div>
-                {error && <div className="error-message">⚠ {error}</div>}
-                {success && <div className="success-message">✓ {success}</div>}
+                {error && <div className="error-message"><IconAlert width={16} height={16} />{error}</div>}
+                {success && <div className="success-message"><IconCheck width={16} height={16} />{success}</div>}
                 <button type="submit" className="btn-primary" disabled={loading}>
                     {loading ? 'Updating…' : 'Update Password'}
                 </button>
@@ -73,7 +89,8 @@ const StoreOwnerDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [sort, setSort] = useState({ field: 'name', dir: 'asc' });
-    const [search, setSearch] = useState('');
+    const [searchInput, setSearchInput] = useState('');
+    const search = useDebouncedValue(searchInput, 300);
     const { api } = useAuth();
 
     const fetchDashboardData = useCallback(async () => {
@@ -106,15 +123,6 @@ const StoreOwnerDashboard = () => {
     const location = typeof window !== 'undefined' ? window.location.pathname : '/store-owner';
     const isPassword = location.includes('password');
 
-    if (loading) return (
-        <div className="app-layout">
-            <Sidebar />
-            <div className="main-content" style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
-                <div style={{color:'var(--text-2)'}}>Loading dashboard…</div>
-            </div>
-        </div>
-    );
-
     return (
         <div className="app-layout">
             <Sidebar />
@@ -136,22 +144,30 @@ const StoreOwnerDashboard = () => {
                             <p className="page-subtitle">View your store's performance and ratings</p>
                         </div>
                         <div className="page-body">
-                            {error && <div className="error-message" style={{marginBottom:'1.5rem'}}>⚠ {error}</div>}
+                            {error && <div className="error-message" style={{ marginBottom: '1.5rem' }}><IconAlert width={16} height={16} />{error}</div>}
 
-                            <div className="stats-grid" style={{gridTemplateColumns:'repeat(auto-fit, minmax(180px, 1fr))'}}>
+                            <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
                                 <div className="stat-card">
-                                    <div className="stat-icon">⭐</div>
+                                    <div className="stat-icon" style={{ color: 'var(--gold)' }}><IconStar filled width={22} height={22} /></div>
                                     <div className="stat-label">Average Rating</div>
                                     <div className="stat-value">
-                                        {dashboardData?.averageRating
-                                            ? parseFloat(dashboardData.averageRating).toFixed(1)
-                                            : '—'}
+                                        {loading ? (
+                                            <div className="skeleton" style={{ height: '28px', width: '50%' }} />
+                                        ) : dashboardData?.averageRating ? (
+                                            parseFloat(dashboardData.averageRating).toFixed(1)
+                                        ) : '—'}
                                     </div>
                                 </div>
                                 <div className="stat-card">
-                                    <div className="stat-icon">👥</div>
+                                    <div className="stat-icon"><IconUsers width={22} height={22} /></div>
                                     <div className="stat-label">Total Raters</div>
-                                    <div className="stat-value">{dashboardData?.raters?.length || 0}</div>
+                                    <div className="stat-value">
+                                        {loading ? (
+                                            <div className="skeleton" style={{ height: '28px', width: '30%' }} />
+                                        ) : (
+                                            dashboardData?.raters?.length || 0
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -161,8 +177,8 @@ const StoreOwnerDashboard = () => {
 
                             <div className="filter-bar">
                                 <div className="search-input-wrapper">
-                                    <span className="search-icon">🔍</span>
-                                    <input placeholder="Search by name or email…" value={search} onChange={e => setSearch(e.target.value)} />
+                                    <span className="search-icon"><IconSearch width={16} height={16} /></span>
+                                    <input placeholder="Search by name or email…" value={searchInput} onChange={e => setSearchInput(e.target.value)} />
                                 </div>
                             </div>
 
@@ -177,26 +193,35 @@ const StoreOwnerDashboard = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {filteredRaters.length === 0 ? (
+                                        {loading ? (
+                                            <SkeletonRows cols={4} />
+                                        ) : filteredRaters.length === 0 ? (
                                             <tr>
                                                 <td colSpan="4">
                                                     <div className="empty-state">
-                                                        <div className="empty-state-icon">⭐</div>
+                                                        <div className="empty-state-icon"><IconStar /></div>
                                                         <p>No ratings submitted yet.</p>
+                                                        {searchInput && <button className="btn-link" onClick={() => setSearchInput('')}>Clear search</button>}
                                                     </div>
                                                 </td>
                                             </tr>
                                         ) : filteredRaters.map((rater, i) => (
                                             <tr key={i}>
-                                                <td style={{color:'var(--text)', fontWeight:'500'}}>{rater.name}</td>
+                                                <td style={{ color: 'var(--text)', fontWeight: '500' }}>{rater.name}</td>
                                                 <td>{rater.email}</td>
                                                 <td>
-                                                    <span style={{display:'flex', alignItems:'center', gap:'0.4rem'}}>
-                                                        <span style={{color:'#f59e0b'}}>{'★'.repeat(rater.rating)}<span style={{color:'var(--text-3)'}}>{'★'.repeat(5-rater.rating)}</span></span>
-                                                        <span style={{color:'var(--text-2)', fontSize:'0.85rem'}}>{rater.rating}/5</span>
+                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                        <span className="stars">
+                                                            {[1, 2, 3, 4, 5].map(n => (
+                                                                <span key={n} className={`star ${n <= rater.rating ? 'filled' : ''}`}>
+                                                                    <IconStar filled={n <= rater.rating} width={14} height={14} />
+                                                                </span>
+                                                            ))}
+                                                        </span>
+                                                        <span style={{ color: 'var(--text-2)', fontSize: '0.85rem' }}>{rater.rating}/5</span>
                                                     </span>
                                                 </td>
-                                                <td>{new Date(rater.updated_at).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })}</td>
+                                                <td>{new Date(rater.updated_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
                                             </tr>
                                         ))}
                                     </tbody>

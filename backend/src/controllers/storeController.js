@@ -184,3 +184,115 @@ exports.getStoreOwnerDashboard = async (req, res) => {
         res.status(500).json({ message: 'Server error while fetching store dashboard' });
     }
 };
+
+// Admin updates a store's core details
+exports.updateStoreByAdmin = async (req, res) => {
+    const { id } = req.params;
+    const { name, email, address, owner_id } = req.body;
+
+    if (!name || !email || !address) {
+        return res.status(400).json({ message: 'Please provide name, email, and address for the store' });
+    }
+    if (name.length < 20 || name.length > 60) {
+        return res.status(400).json({ message: 'Store name must be between 20 and 60 characters.' });
+    }
+    if (address.length > 400) {
+        return res.status(400).json({ message: 'Address must not exceed 400 characters.' });
+    }
+
+    try {
+        const [existing] = await db.query('SELECT id FROM stores WHERE id = ?', [id]);
+        if (existing.length === 0) {
+            return res.status(404).json({ message: 'Store not found.' });
+        }
+
+        if (owner_id) {
+            const [users] = await db.query('SELECT role FROM users WHERE id = ?', [owner_id]);
+            if (users.length === 0 || users[0].role.toUpperCase() !== 'STORE_OWNER') {
+                return res.status(400).json({ message: 'Invalid owner ID or the user is not a Store Owner' });
+            }
+        }
+
+        await db.query(
+            'UPDATE stores SET name = ?, email = ?, address = ?, owner_id = ? WHERE id = ?',
+            [name, email, address, owner_id || null, id]
+        );
+
+        res.json({ message: 'Store updated successfully.' });
+
+    } catch (error) {
+        console.error(error);
+        if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ message: 'A store with this email already exists.' });
+        }
+        res.status(500).json({ message: 'Server error while updating store.' });
+    }
+};
+
+// Admin deletes a store (its ratings go with it)
+exports.deleteStoreByAdmin = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [existing] = await db.query('SELECT id FROM stores WHERE id = ?', [id]);
+        if (existing.length === 0) {
+            return res.status(404).json({ message: 'Store not found.' });
+        }
+
+        await db.query('DELETE FROM ratings WHERE store_id = ?', [id]);
+        await db.query('DELETE FROM stores WHERE id = ?', [id]);
+
+        res.json({ message: 'Store deleted successfully.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error while deleting store.' });
+    }
+};
+
+// Store details page — store info plus every individual review, for any
+// logged-in user (mirrors a public "reviews" page, e.g. Google Maps).
+exports.getStoreDetails = async (req, res) => {
+    const { storeId } = req.params;
+    const userId = req.user.id;
+
+    try {
+        const [stores] = await db.query('SELECT id, name, email, address FROM stores WHERE id = ?', [storeId]);
+        if (stores.length === 0) {
+            return res.status(404).json({ message: 'Store not found.' });
+        }
+
+        const [avgResult] = await db.query(
+            'SELECT AVG(rating) as overallRating, COUNT(*) as totalRatings FROM ratings WHERE store_id = ?',
+            [storeId]
+        );
+
+        const [userRatingResult] = await db.query(
+            'SELECT rating FROM ratings WHERE store_id = ? AND user_id = ?',
+            [storeId, userId]
+        );
+
+        const [reviews] = await db.query(
+            `SELECT u.name, r.rating, r.updated_at
+             FROM ratings r
+             JOIN users u ON r.user_id = u.id
+             WHERE r.store_id = ?
+             ORDER BY r.updated_at DESC`,
+            [storeId]
+        );
+
+        res.json({
+            store: stores[0],
+            overallRating: avgResult[0].overallRating
+                ? parseFloat(avgResult[0].overallRating).toFixed(2)
+                : null,
+            totalRatings: avgResult[0].totalRatings,
+            userSubmittedRating: userRatingResult[0]?.rating ?? null,
+            reviews,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error while fetching store details' });
+    }
+};

@@ -1,24 +1,25 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { IconSeal, IconGrid, IconUsers, IconStorefront, IconKey, IconLogOut } from '../icons/Icons';
 
 const roleNavItems = {
     ADMIN: [
-        { icon: '⬛', label: 'Dashboard', path: '/admin' },
-        { icon: '👥', label: 'Users', path: '/admin/users' },
-        { icon: '🏪', label: 'Stores', path: '/admin/stores' },
+        { icon: IconGrid, label: 'Dashboard', path: '/admin' },
+        { icon: IconUsers, label: 'Users', path: '/admin/users' },
+        { icon: IconStorefront, label: 'Stores', path: '/admin/stores' },
     ],
     USER: [
-        { icon: '🏪', label: 'Browse Stores', path: '/user' },
-        { icon: '🔑', label: 'Change Password', path: '/user/password' },
+        { icon: IconStorefront, label: 'Browse Stores', path: '/user' },
+        { icon: IconKey, label: 'Change Password', path: '/user/password' },
     ],
     STORE_OWNER: [
-        { icon: '⬛', label: 'My Store', path: '/store-owner' },
-        { icon: '🔑', label: 'Change Password', path: '/store-owner/password' },
+        { icon: IconGrid, label: 'My Store', path: '/store-owner' },
+        { icon: IconKey, label: 'Change Password', path: '/store-owner/password' },
     ],
 };
 
-const Sidebar = ({ activeSection, onNavigate }) => {
+const Sidebar = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -40,22 +41,25 @@ const Sidebar = ({ activeSection, onNavigate }) => {
     return (
         <aside className="sidebar">
             <div className="sidebar-brand">
-                <div className="sidebar-brand-icon">⭐</div>
+                <span className="sidebar-brand-icon"><IconSeal /></span>
                 <span className="sidebar-brand-name">RateStore</span>
             </div>
 
             <nav className="sidebar-nav">
                 <div className="sidebar-section-label">Navigation</div>
-                {navItems.map(item => (
-                    <button
-                        key={item.path}
-                        className={`sidebar-nav-item ${location.pathname === item.path ? 'active' : ''}`}
-                        onClick={() => navigate(item.path)}
-                    >
-                        <span className="nav-icon">{item.icon}</span>
-                        {item.label}
-                    </button>
-                ))}
+                {navItems.map(item => {
+                    const Icon = item.icon;
+                    return (
+                        <button
+                            key={item.path}
+                            className={`sidebar-nav-item ${location.pathname === item.path ? 'active' : ''}`}
+                            onClick={() => navigate(item.path)}
+                        >
+                            <span className="nav-icon"><Icon /></span>
+                            {item.label}
+                        </button>
+                    );
+                })}
             </nav>
 
             <div className="sidebar-footer">
@@ -67,7 +71,7 @@ const Sidebar = ({ activeSection, onNavigate }) => {
                     </div>
                 </div>
                 <button className="sidebar-nav-item" onClick={handleLogout} style={{color:'var(--error)'}}>
-                    <span className="nav-icon">↩</span>
+                    <span className="nav-icon"><IconLogOut /></span>
                     Sign out
                 </button>
             </div>

@@ -1,3 +1,5 @@
+// authController.js — only registerUser changed, rest stays exactly the same
+
 const bcrypt = require('bcryptjs');
 const db = require('../config/db');
 const { generateToken } = require('../utils/jwtHelper');
@@ -13,9 +15,9 @@ const validatePassword = (password) => {
     return null;
 };
 
-// Register a new user (Normal User role by default)
+// Register a new user — allows USER or STORE_OWNER (never ADMIN via public signup)
 exports.registerUser = async (req, res) => {
-    const { name, email, address, password } = req.body;
+    const { name, email, address, password, role } = req.body;
 
     if (!name || !email || !address || !password) {
         return res.status(400).json({ message: 'Please enter all fields' });
@@ -35,6 +37,13 @@ exports.registerUser = async (req, res) => {
     const pwError = validatePassword(password);
     if (pwError) return res.status(400).json({ message: pwError });
 
+    // Role validation — public signup can only create USER or STORE_OWNER.
+    // Defaults to USER if not provided (keeps old behavior for any old callers).
+    const normalizedRole = (role || 'USER').toUpperCase();
+    if (!['USER', 'STORE_OWNER'].includes(normalizedRole)) {
+        return res.status(400).json({ message: 'Invalid role selected.' });
+    }
+
     try {
         const [userExists] = await db.query('SELECT email FROM users WHERE email = ?', [email]);
         if (userExists.length > 0) {
@@ -44,10 +53,9 @@ exports.registerUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Always store roles as UPPERCASE for consistency
         await db.query(
             'INSERT INTO users (name, email, address, password, role) VALUES (?, ?, ?, ?, ?)',
-            [name, email, address, hashedPassword, 'USER']
+            [name, email, address, hashedPassword, normalizedRole]
         );
 
         res.status(201).json({ message: 'User registered successfully!' });

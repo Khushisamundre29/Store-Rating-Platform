@@ -1,13 +1,19 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Sidebar from '../components/layout/Header';
+import { useToast } from '../context/ToastContext';
+import { useDebouncedValue } from '../hooks/useDebounce';
+import Sidebar from '../components/layout/Sidebar';
+import { IconSearch, IconStar, IconAlert, IconCheck, IconStorefront } from '../components/icons/Icons';
 
 const StarRating = ({ value }) => {
     const v = parseFloat(value) || 0;
     return (
         <span className="stars">
-            {[1,2,3,4,5].map(i => (
-                <span key={i} className={`star ${i <= Math.round(v) ? 'filled' : ''}`}>★</span>
+            {[1, 2, 3, 4, 5].map(i => (
+                <span key={i} className={`star ${i <= Math.round(v) ? 'filled' : ''}`}>
+                    <IconStar filled={i <= Math.round(v)} width={14} height={14} />
+                </span>
             ))}
         </span>
     );
@@ -44,22 +50,22 @@ const ChangePasswordSection = ({ api }) => {
 
     return (
         <div className="password-section">
-            <h3 style={{marginBottom:'1.25rem', fontSize:'1.05rem'}}>Change Password</h3>
+            <h3 style={{ marginBottom: '1.25rem', fontSize: '1.05rem' }}>Change Password</h3>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label>Current Password</label>
-                    <input type="password" value={form.current} onChange={e => setForm(f=>({...f,current:e.target.value}))} required disabled={loading} />
+                    <input type="password" value={form.current} onChange={e => setForm(f => ({ ...f, current: e.target.value }))} required disabled={loading} />
                 </div>
                 <div className="form-group">
                     <label>New Password</label>
-                    <input type="password" placeholder="8–16 chars, 1 uppercase, 1 special" value={form.newPw} onChange={e => setForm(f=>({...f,newPw:e.target.value}))} required disabled={loading} />
+                    <input type="password" placeholder="8–16 chars, 1 uppercase, 1 special" value={form.newPw} onChange={e => setForm(f => ({ ...f, newPw: e.target.value }))} required disabled={loading} />
                 </div>
                 <div className="form-group">
                     <label>Confirm New Password</label>
-                    <input type="password" value={form.confirm} onChange={e => setForm(f=>({...f,confirm:e.target.value}))} required disabled={loading} />
+                    <input type="password" value={form.confirm} onChange={e => setForm(f => ({ ...f, confirm: e.target.value }))} required disabled={loading} />
                 </div>
-                {error && <div className="error-message">⚠ {error}</div>}
-                {success && <div className="success-message">✓ {success}</div>}
+                {error && <div className="error-message"><IconAlert width={16} height={16} />{error}</div>}
+                {success && <div className="success-message"><IconCheck width={16} height={16} />{success}</div>}
                 <button type="submit" className="btn-primary" disabled={loading}>
                     {loading ? 'Updating…' : 'Update Password'}
                 </button>
@@ -71,6 +77,7 @@ const ChangePasswordSection = ({ api }) => {
 const StoreCard = ({ store, onRate }) => {
     const [rating, setRating] = useState(store.userSubmittedRating || 0);
     const [submitting, setSubmitting] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => { setRating(store.userSubmittedRating || 0); }, [store.userSubmittedRating]);
 
@@ -84,7 +91,9 @@ const StoreCard = ({ store, onRate }) => {
     return (
         <div className="store-card">
             <div className="store-card-header">
-                <div className="store-card-name">{store.name}</div>
+                <button className="store-card-name store-card-name-link" onClick={() => navigate(`/stores/${store.id}`)}>
+                    {store.name}
+                </button>
             </div>
             <p className="store-card-address">{store.address}</p>
 
@@ -93,12 +102,12 @@ const StoreCard = ({ store, onRate }) => {
                     <span className="rating-item-label">Overall</span>
                     <span className="rating-item-value highlighted">{store.overallRating ? parseFloat(store.overallRating).toFixed(1) : '—'}</span>
                 </div>
-                <div style={{width:'1px', background:'var(--border)'}} />
+                <div style={{ width: '1px', background: 'var(--border)' }} />
                 <div className="rating-item">
                     <span className="rating-item-label">Your Rating</span>
                     <span className="rating-item-value">{store.userSubmittedRating || '—'}</span>
                 </div>
-                <div style={{width:'1px', background:'var(--border)'}} />
+                <div style={{ width: '1px', background: 'var(--border)' }} />
                 <div className="rating-item">
                     <span className="rating-item-label">Stars</span>
                     <StarRating value={store.overallRating} />
@@ -124,12 +133,13 @@ const StoreCard = ({ store, onRate }) => {
 
 const UserDashboard = () => {
     const [stores, setStores] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchInput, setSearchInput] = useState('');
+    const searchTerm = useDebouncedValue(searchInput, 300);
     const [searchType, setSearchType] = useState('name');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [activeView, setActiveView] = useState('stores'); // 'stores' | 'password'
     const { api } = useAuth();
+    const toast = useToast();
 
     const fetchStores = useCallback(async () => {
         setLoading(true); setError('');
@@ -148,14 +158,13 @@ const UserDashboard = () => {
     const handleRatingSubmit = async (storeId, rating) => {
         try {
             await api.post(`/api/stores/${storeId}/ratings`, { rating });
+            toast.success('Rating submitted.');
             fetchStores();
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to submit rating.');
+            toast.error(err.response?.data?.message || 'Failed to submit rating.');
         }
     };
 
-    // Determine active view from sidebar click (handled via location in Header)
-    // For now use internal state toggled from page header location
     const location = typeof window !== 'undefined' ? window.location.pathname : '/user';
     const isPassword = location.includes('password');
 
@@ -182,11 +191,11 @@ const UserDashboard = () => {
                         <div className="page-body">
                             <div className="filter-bar">
                                 <div className="search-input-wrapper">
-                                    <span className="search-icon">🔍</span>
+                                    <span className="search-icon"><IconSearch width={16} height={16} /></span>
                                     <input
                                         placeholder={`Search by store ${searchType}…`}
-                                        value={searchTerm}
-                                        onChange={e => setSearchTerm(e.target.value)}
+                                        value={searchInput}
+                                        onChange={e => setSearchInput(e.target.value)}
                                     />
                                 </div>
                                 <select className="filter-select" value={searchType} onChange={e => setSearchType(e.target.value)}>
@@ -197,23 +206,24 @@ const UserDashboard = () => {
 
                             {loading && (
                                 <div className="stores-grid">
-                                    {[1,2,3,4,5,6].map(i => (
+                                    {[1, 2, 3, 4, 5, 6].map(i => (
                                         <div key={i} className="store-card">
-                                            <div className="skeleton" style={{height:'24px', width:'60%', marginBottom:'0.75rem'}} />
-                                            <div className="skeleton" style={{height:'16px', width:'80%', marginBottom:'0.5rem'}} />
-                                            <div className="skeleton" style={{height:'60px'}} />
+                                            <div className="skeleton" style={{ height: '24px', width: '60%', marginBottom: '0.75rem' }} />
+                                            <div className="skeleton" style={{ height: '16px', width: '80%', marginBottom: '0.5rem' }} />
+                                            <div className="skeleton" style={{ height: '60px' }} />
                                         </div>
                                     ))}
                                 </div>
                             )}
 
-                            {error && <div className="error-message">⚠ {error}</div>}
+                            {error && <div className="error-message"><IconAlert width={16} height={16} />{error}</div>}
 
                             {!loading && !error && (
                                 stores.length === 0 ? (
                                     <div className="empty-state">
-                                        <div className="empty-state-icon">🏪</div>
+                                        <div className="empty-state-icon"><IconStorefront /></div>
                                         <p>No stores found matching your search.</p>
+                                        {searchInput && <button className="btn-link" onClick={() => setSearchInput('')}>Clear search</button>}
                                     </div>
                                 ) : (
                                     <div className="stores-grid">

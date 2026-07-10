@@ -7,6 +7,8 @@ const { protect, isAdmin } = require('../middlewares/authMiddleware');
 router.post('/', protect, isAdmin, userController.createUserByAdmin);      // Create user
 router.get('/', protect, isAdmin, userController.getAllUsersByAdmin);       // List all users
 router.get('/:id', protect, isAdmin, userController.getUserByIdByAdmin);   // Get user by ID
+router.put('/:id', protect, isAdmin, userController.updateUserByAdmin);    // Update user
+router.delete('/:id', protect, isAdmin, userController.deleteUserByAdmin); // Delete user
 
 // NOTE: Password change is handled at PUT /api/auth/password (in authRoutes)
 // It is NOT here to avoid the /:id wildcard swallowing /update-password
