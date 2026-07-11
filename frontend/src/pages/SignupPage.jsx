@@ -21,8 +21,8 @@ const EyeIcon = ({ open }) => (
 
 const validate = (fields) => {
     const errors = {};
-    if (fields.name && (fields.name.length < 20 || fields.name.length > 60))
-        errors.name = 'Name must be 20–60 characters.';
+    if (fields.name && (fields.name.length < 2 || fields.name.length > 100))
+        errors.name = 'Name must be 2–100 characters.';
     if (fields.address && fields.address.length > 400)
         errors.address = 'Address must be under 400 characters.';
     if (fields.password) {
