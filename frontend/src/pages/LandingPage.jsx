@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     IconSeal, IconArrowRight, IconStar, IconStorefront,
@@ -16,8 +16,46 @@ const TICKER_ITEMS = [
     { name: 'Loom & Weave', city: 'MG Road', rating: '4.4' },
 ];
 
+// A small hand-drawn-feeling typewriter: types "Store Name  city  ★ rating",
+// holds for a beat, deletes, moves to the next store.
+const useTypewriter = (items, typeSpeed = 45, holdMs = 1400, deleteSpeed = 22) => {
+    const [index, setIndex] = useState(0);
+    const [text, setText] = useState('');
+    const [phase, setPhase] = useState('typing'); // typing | holding | deleting
+
+    useEffect(() => {
+        const full = `${items[index].name} — ${items[index].city}  ★ ${items[index].rating}`;
+
+        if (phase === 'typing') {
+            if (text.length < full.length) {
+                const t = setTimeout(() => setText(full.slice(0, text.length + 1)), typeSpeed);
+                return () => clearTimeout(t);
+            }
+            const t = setTimeout(() => setPhase('holding'), holdMs);
+            return () => clearTimeout(t);
+        }
+
+        if (phase === 'holding') {
+            const t = setTimeout(() => setPhase('deleting'), 200);
+            return () => clearTimeout(t);
+        }
+
+        if (phase === 'deleting') {
+            if (text.length > 0) {
+                const t = setTimeout(() => setText(text.slice(0, -1)), deleteSpeed);
+                return () => clearTimeout(t);
+            }
+            setIndex((i) => (i + 1) % items.length);
+            setPhase('typing');
+        }
+    }, [text, phase, index, items, typeSpeed, holdMs, deleteSpeed]);
+
+    return text;
+};
+
 const LandingPage = () => {
     const navigate = useNavigate();
+    const typedRating = useTypewriter(TICKER_ITEMS);
 
     return (
         <div className="rs-land">
@@ -85,11 +123,15 @@ const LandingPage = () => {
                 .rs-land-nav-cta::before { left: -5px; }
                 .rs-land-nav-cta::after { right: -5px; }
 
-                /* ---------- Hero (light, type-led) ---------- */
+                /* ---------- Hero: text + storefronts illustration ---------- */
                 .rs-land-hero {
                     max-width: 1200px;
                     margin: 0 auto;
                     padding: 3rem 3rem 3.5rem;
+                    display: grid;
+                    grid-template-columns: 1.1fr 0.9fr;
+                    gap: 2.5rem;
+                    align-items: center;
                 }
                 .rs-land-eyebrow {
                     display: inline-flex;
@@ -110,10 +152,10 @@ const LandingPage = () => {
                 .rs-land-hero h1 {
                     font-family: var(--font-display);
                     font-weight: 500;
-                    font-size: 4rem;
-                    line-height: 1.05;
+                    font-size: 3.6rem;
+                    line-height: 1.08;
                     color: var(--ink);
-                    max-width: 780px;
+                    max-width: 620px;
                     margin: 0 0 1.5rem;
                 }
                 .rs-land-hero h1 em {
@@ -155,6 +197,92 @@ const LandingPage = () => {
                     transition: border-color 0.15s ease;
                 }
                 .rs-land-btn-ghost:hover { border-color: var(--accent); }
+
+                /* ---------- Storefronts illustration ---------- */
+                .rs-land-storefronts {
+                    position: relative;
+                    display: flex;
+                    align-items: flex-end;
+                    justify-content: center;
+                    gap: 0.9rem;
+                    height: 210px;
+                    padding: 0 0.5rem;
+                }
+                .rs-land-building {
+                    position: relative;
+                    border-radius: 6px 6px 0 0;
+                    box-shadow: var(--shadow-card);
+                }
+                .rs-land-building::before {
+                    content: '';
+                    position: absolute;
+                    top: 10px; left: 10px; right: 10px;
+                    height: 14px;
+                    border-radius: 3px;
+                    background: repeating-linear-gradient(
+                        45deg, var(--rs-awning, var(--accent)) 0 8px,
+                        var(--surface) 8px 16px
+                    );
+                }
+                .rs-land-building .door {
+                    position: absolute;
+                    bottom: 0; left: 50%;
+                    transform: translateX(-50%);
+                    width: 22px; height: 34px;
+                    background: var(--ink);
+                    border-radius: 4px 4px 0 0;
+                }
+                .rs-land-building .window {
+                    position: absolute;
+                    width: 14px; height: 14px;
+                    border-radius: 3px;
+                    background: var(--accent-tint);
+                    border: 1px solid var(--border);
+                }
+                .rs-land-b1 { width: 84px; height: 130px; background: var(--surface); transform: rotate(-1.5deg); }
+                .rs-land-b1 .window { top: 40px; left: 14px; }
+                .rs-land-b1 .window:nth-child(3) { left: 50px; }
+                .rs-land-b2 { width: 100px; height: 170px; background: var(--surface); --rs-awning: var(--gold); transform: rotate(1deg); z-index: 1; }
+                .rs-land-b2 .window { top: 34px; left: 16px; }
+                .rs-land-b2 .window:nth-child(3) { left: 62px; }
+                .rs-land-b2 .window:nth-child(4) { top: 64px; left: 16px; }
+                .rs-land-b2 .window:nth-child(5) { top: 64px; left: 62px; }
+                .rs-land-b3 { width: 84px; height: 110px; background: var(--surface); --rs-awning: var(--success); transform: rotate(-0.5deg); }
+                .rs-land-b3 .window { top: 40px; left: 14px; }
+                .rs-land-b3 .window:nth-child(3) { left: 50px; }
+                .rs-land-b-star {
+                    position: absolute;
+                    top: -14px; left: 50%;
+                    transform: translateX(-50%);
+                    color: var(--gold);
+                    animation: rs-star-bob 2.6s ease-in-out infinite;
+                }
+                @keyframes rs-star-bob {
+                    0%, 100% { transform: translateX(-50%) translateY(0); }
+                    50% { transform: translateX(-50%) translateY(-4px); }
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .rs-land-b-star { animation: none; }
+                }
+
+                .rs-land-typewriter {
+                    max-width: 320px;
+                    margin: 1rem auto 0;
+                    text-align: center;
+                    font-family: var(--font-mono);
+                    font-size: 0.8rem;
+                    color: var(--text-2);
+                    min-height: 1.2em;
+                }
+                .rs-land-typewriter-cursor {
+                    display: inline-block;
+                    width: 2px; height: 0.95em;
+                    background: var(--accent);
+                    margin-left: 2px;
+                    vertical-align: text-bottom;
+                    animation: rs-cursor-blink 1s step-end infinite;
+                }
+                @keyframes rs-cursor-blink { 50% { opacity: 0; } }
 
                 /* ---------- Ticker (signature element) ---------- */
                 .rs-land-ticker {
@@ -251,51 +379,6 @@ const LandingPage = () => {
                 .rs-land-bento-list li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: var(--text-2); }
                 .rs-land-bento-list svg { color: var(--accent); flex-shrink: 0; }
 
-                /* ---------- How it works: receipt ---------- */
-                .rs-land-receipt-wrap { display: flex; justify-content: center; }
-                .rs-land-receipt {
-                    position: relative;
-                    background: var(--surface);
-                    width: 100%;
-                    max-width: 420px;
-                    padding: 2rem 2rem 1.5rem;
-                    font-family: var(--font-mono);
-                    box-shadow: var(--shadow-card);
-                }
-                .rs-land-receipt::before, .rs-land-receipt::after {
-                    content: '';
-                    position: absolute;
-                    left: 0; right: 0;
-                    height: 12px;
-                    background:
-                        linear-gradient(-45deg, var(--paper) 6px, transparent 0),
-                        linear-gradient(45deg, var(--paper) 6px, transparent 0);
-                    background-size: 12px 12px;
-                }
-                .rs-land-receipt::before { top: -1px; background-position: left top; }
-                .rs-land-receipt::after { bottom: -1px; transform: rotate(180deg); }
-                .rs-land-receipt-head { text-align: center; margin-bottom: 1.25rem; }
-                .rs-land-receipt-head strong {
-                    display: block; font-size: 0.85rem; letter-spacing: 0.06em;
-                    color: var(--ink); margin-bottom: 0.2rem;
-                }
-                .rs-land-receipt-head span { font-size: 0.72rem; color: var(--text-3); }
-                .rs-land-receipt-rule { border-top: 1px dashed var(--border); margin: 0.9rem 0; }
-                .rs-land-receipt-row { display: flex; gap: 0.85rem; padding: 0.6rem 0; align-items: flex-start; }
-                .rs-land-receipt-num { color: var(--accent-dark); font-weight: 500; font-size: 0.8rem; flex-shrink: 0; }
-                .rs-land-receipt-row div strong {
-                    display: block; font-family: var(--font-body); font-weight: 600;
-                    font-size: 0.88rem; color: var(--ink); margin-bottom: 0.15rem;
-                }
-                .rs-land-receipt-row div p {
-                    margin: 0; font-family: var(--font-body); font-size: 0.8rem;
-                    color: var(--text-2); line-height: 1.5;
-                }
-                .rs-land-receipt-foot {
-                    text-align: center; font-size: 0.72rem; color: var(--text-3);
-                    letter-spacing: 0.04em; margin-top: 0.5rem;
-                }
-
                 /* ---------- CTA: stamp ---------- */
                 .rs-land-cta-wrap { max-width: 1200px; margin: 0 auto; padding: 0 3rem 5rem; }
                 .rs-land-cta {
@@ -355,7 +438,7 @@ const LandingPage = () => {
                 }
 
                 @media (max-width: 860px) {
-                    .rs-land-hero { padding: 2.5rem 1.5rem 2.5rem; }
+                    .rs-land-hero { grid-template-columns: 1fr; padding: 2.5rem 1.5rem 2.5rem; }
                     .rs-land-hero h1 { font-size: 2.4rem; }
                     .rs-land-nav { padding: 1.25rem 1.5rem; }
                     .rs-land-section { padding: 3rem 1.5rem; }
@@ -379,19 +462,47 @@ const LandingPage = () => {
 
             {/* ---------- Hero ---------- */}
             <header className="rs-land-hero">
-               
-                <h1>Know which stores<br /><em>actually</em> deliver.</h1>
-                <p className="rs-land-hero-sub">
-                    RateStore connects users, store owners, and admins on one platform 
-                    browse stores, leave honest ratings, and track performance in real time.
-                </p>
-                <div className="rs-land-hero-actions">
-                    <button className="rs-land-btn-primary" onClick={() => navigate('/signup')}>
-                        Create your account <IconArrowRight width={16} height={16} />
-                    </button>
-                    <button className="rs-land-btn-ghost" onClick={() => navigate('/login')}>
-                        Sign in
-                    </button>
+                <div>
+                    <h1>Know which stores<br /><em>actually</em> deliver.</h1>
+                    <p className="rs-land-hero-sub">
+                        RateStore connects users, store owners, and admins on one platform 
+                        browse stores, leave honest ratings, and track performance in real time.
+                    </p>
+                    <div className="rs-land-hero-actions">
+                        <button className="rs-land-btn-primary" onClick={() => navigate('/signup')}>
+                            Create your account <IconArrowRight width={16} height={16} />
+                        </button>
+                        <button className="rs-land-btn-ghost" onClick={() => navigate('/login')}>
+                            Sign in
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <div className="rs-land-storefronts">
+                        <div className="rs-land-building rs-land-b1">
+                            <span className="window" />
+                            <span className="window" />
+                            <span className="door" />
+                        </div>
+                        <div className="rs-land-building rs-land-b2">
+                            <IconStar filled width={16} height={16} className="rs-land-b-star" />
+                            <span className="window" />
+                            <span className="window" />
+                            <span className="window" />
+                            <span className="window" />
+                            <span className="door" />
+                        </div>
+                        <div className="rs-land-building rs-land-b3">
+                            <span className="window" />
+                            <span className="window" />
+                            <span className="door" />
+                        </div>
+                    </div>
+                    <div className="rs-land-typewriter">
+                        {typedRating}
+                        <span className="rs-land-typewriter-cursor" />
+                    </div>
                 </div>
             </header>
 
@@ -448,45 +559,6 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* ---------- How it works: receipt ---------- */}
-            <section className="rs-land-section">
-                <div className="rs-land-section-head">
-                    <span>How it works</span>
-                    <h2>Get started in three steps</h2>
-                </div>
-                <div className="rs-land-receipt-wrap">
-                    <div className="rs-land-receipt">
-                        <div className="rs-land-receipt-head">
-                            <strong>RATESTORE · ORDER OF USE</strong>
-                        </div>
-                        <div className="rs-land-receipt-rule" />
-                        <div className="rs-land-receipt-row">
-                            <span className="rs-land-receipt-num">01</span>
-                            <div>
-                                <strong>Create your account</strong>
-                                <p>Sign up as a user or a store owner pick the role that fits you.</p>
-                            </div>
-                        </div>
-                        <div className="rs-land-receipt-row">
-                            <span className="rs-land-receipt-num">02</span>
-                            <div>
-                                <strong>Find or list a store</strong>
-                                <p>Users browse and search store owners get their dashboard set up.</p>
-                            </div>
-                        </div>
-                        <div className="rs-land-receipt-row">
-                            <span className="rs-land-receipt-num">03</span>
-                            <div>
-                                <strong>Rate and track</strong>
-                                <p>Submit ratings or watch them roll in  updated in real time.</p>
-                            </div>
-                        </div>
-                        <div className="rs-land-receipt-rule" />
-                        <div className="rs-land-receipt-foot">* thank you for joining us *</div>
-                    </div>
-                </div>
-            </section>
-
             {/* ---------- CTA ---------- */}
             <div className="rs-land-cta-wrap">
                 <section className="rs-land-cta">
@@ -501,7 +573,7 @@ const LandingPage = () => {
             </div>
 
             <footer className="rs-land-footer">
-                ©  Built for honest ratings.
+                © 2025 Store Rating Platform. All rights reserved by Khushi Samundre. 
             </footer>
         </div>
     );
