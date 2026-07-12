@@ -573,7 +573,7 @@ const LandingPage = () => {
             </div>
 
             <footer className="rs-land-footer">
-                © 2025 Store Rating Platform. All rights reserved by Khushi Samundre. 
+                © 2026 Store Rating Platform. All rights reserved by Khushi Samundre. 
             </footer>
         </div>
     );
