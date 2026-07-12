@@ -60,7 +60,7 @@ const LandingPage = () => {
     return (
         <div className="rs-land">
             <style>{`
-                .rs-land {
+                .land {
                     height: 100vh;
                     overflow-y: auto;
                     background: var(--paper);
@@ -68,7 +68,7 @@ const LandingPage = () => {
                 }
 
                 /* ---------- Nav ---------- */
-                .rs-land-nav {
+                .land-nav {
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
@@ -76,7 +76,7 @@ const LandingPage = () => {
                     max-width: 1200px;
                     margin: 0 auto;
                 }
-                .rs-land-nav-brand {
+                .land-nav-brand {
                     display: flex;
                     align-items: center;
                     gap: 0.55rem;
@@ -84,9 +84,9 @@ const LandingPage = () => {
                     font-size: 1.15rem;
                     color: var(--ink);
                 }
-                .rs-land-nav-brand svg { color: var(--accent); }
-                .rs-land-nav-actions { display: flex; gap: 1.5rem; align-items: center; }
-                .rs-land-nav-link {
+                .land-nav-brand svg { color: var(--accent); }
+                .land-nav-actions { display: flex; gap: 1.5rem; align-items: center; }
+                .land-nav-link {
                     background: none;
                     border: none;
                     font-size: 0.88rem;
@@ -95,8 +95,8 @@ const LandingPage = () => {
                     cursor: pointer;
                     padding: 0;
                 }
-                .rs-land-nav-link:hover { color: var(--ink); }
-                .rs-land-nav-cta {
+                .land-nav-link:hover { color: var(--ink); }
+                .land-nav-cta {
                     position: relative;
                     background: var(--accent-tint);
                     color: var(--accent-dark);
@@ -111,7 +111,7 @@ const LandingPage = () => {
                     align-items: center;
                     gap: 0.4rem;
                 }
-                .rs-land-nav-cta::before, .rs-land-nav-cta::after {
+                .land-nav-cta::before, .land-nav-cta::after {
                     content: '';
                     position: absolute;
                     top: 50%;
@@ -120,11 +120,11 @@ const LandingPage = () => {
                     border-radius: 50%;
                     transform: translateY(-50%);
                 }
-                .rs-land-nav-cta::before { left: -5px; }
-                .rs-land-nav-cta::after { right: -5px; }
+                .land-nav-cta::before { left: -5px; }
+                .land-nav-cta::after { right: -5px; }
 
                 /* ---------- Hero: text + storefronts illustration ---------- */
-                .rs-land-hero {
+                .land-hero {
                     max-width: 1200px;
                     margin: 0 auto;
                     padding: 3rem 3rem 3.5rem;
@@ -133,7 +133,7 @@ const LandingPage = () => {
                     gap: 2.5rem;
                     align-items: center;
                 }
-                .rs-land-eyebrow {
+                .land-eyebrow {
                     display: inline-flex;
                     align-items: center;
                     gap: 0.5rem;
@@ -148,8 +148,8 @@ const LandingPage = () => {
                     border-radius: 20px;
                     margin-bottom: 1.75rem;
                 }
-                .rs-land-eyebrow svg { color: var(--gold); }
-                .rs-land-hero h1 {
+                .land-eyebrow svg { color: var(--gold); }
+                .land-hero h1 {
                     font-family: var(--font-display);
                     font-weight: 500;
                     font-size: 3.6rem;
@@ -158,19 +158,19 @@ const LandingPage = () => {
                     max-width: 620px;
                     margin: 0 0 1.5rem;
                 }
-                .rs-land-hero h1 em {
+                .land-hero h1 em {
                     font-style: italic;
                     color: var(--accent);
                 }
-                .rs-land-hero-sub {
+                .land-hero-sub {
                     font-size: 1.05rem;
                     color: var(--text-2);
                     line-height: 1.65;
                     max-width: 460px;
                     margin: 0 0 2.25rem;
                 }
-                .rs-land-hero-actions { display: flex; gap: 0.85rem; }
-                .rs-land-btn-primary {
+                .land-hero-actions { display: flex; gap: 0.85rem; }
+                .land-btn-primary {
                     background: var(--accent);
                     color: #fff;
                     border: none;
@@ -184,8 +184,8 @@ const LandingPage = () => {
                     gap: 0.5rem;
                     transition: background 0.15s ease;
                 }
-                .rs-land-btn-primary:hover { background: var(--accent-dark); }
-                .rs-land-btn-ghost {
+                .land-btn-primary:hover { background: var(--accent-dark); }
+                .land-btn-ghost {
                     background: transparent;
                     color: var(--ink);
                     border: 1px solid var(--border);
@@ -196,10 +196,10 @@ const LandingPage = () => {
                     cursor: pointer;
                     transition: border-color 0.15s ease;
                 }
-                .rs-land-btn-ghost:hover { border-color: var(--accent); }
+                .land-btn-ghost:hover { border-color: var(--accent); }
 
                 /* ---------- Storefronts illustration ---------- */
-                .rs-land-storefronts {
+                .land-storefronts {
                     position: relative;
                     display: flex;
                     align-items: flex-end;
@@ -208,12 +208,12 @@ const LandingPage = () => {
                     height: 210px;
                     padding: 0 0.5rem;
                 }
-                .rs-land-building {
+                .land-building {
                     position: relative;
                     border-radius: 6px 6px 0 0;
                     box-shadow: var(--shadow-card);
                 }
-                .rs-land-building::before {
+                .land-building::before {
                     content: '';
                     position: absolute;
                     top: 10px; left: 10px; right: 10px;
@@ -224,7 +224,7 @@ const LandingPage = () => {
                         var(--surface) 8px 16px
                     );
                 }
-                .rs-land-building .door {
+                .land-building .door {
                     position: absolute;
                     bottom: 0; left: 50%;
                     transform: translateX(-50%);
@@ -232,40 +232,40 @@ const LandingPage = () => {
                     background: var(--ink);
                     border-radius: 4px 4px 0 0;
                 }
-                .rs-land-building .window {
+                .land-building .window {
                     position: absolute;
                     width: 14px; height: 14px;
                     border-radius: 3px;
                     background: var(--accent-tint);
                     border: 1px solid var(--border);
                 }
-                .rs-land-b1 { width: 84px; height: 130px; background: var(--surface); transform: rotate(-1.5deg); }
-                .rs-land-b1 .window { top: 40px; left: 14px; }
-                .rs-land-b1 .window:nth-child(3) { left: 50px; }
-                .rs-land-b2 { width: 100px; height: 170px; background: var(--surface); --rs-awning: var(--gold); transform: rotate(1deg); z-index: 1; }
-                .rs-land-b2 .window { top: 34px; left: 16px; }
-                .rs-land-b2 .window:nth-child(3) { left: 62px; }
-                .rs-land-b2 .window:nth-child(4) { top: 64px; left: 16px; }
-                .rs-land-b2 .window:nth-child(5) { top: 64px; left: 62px; }
-                .rs-land-b3 { width: 84px; height: 110px; background: var(--surface); --rs-awning: var(--success); transform: rotate(-0.5deg); }
-                .rs-land-b3 .window { top: 40px; left: 14px; }
-                .rs-land-b3 .window:nth-child(3) { left: 50px; }
-                .rs-land-b-star {
+                .land-b1 { width: 84px; height: 130px; background: var(--surface); transform: rotate(-1.5deg); }
+                .land-b1 .window { top: 40px; left: 14px; }
+                .land-b1 .window:nth-child(3) { left: 50px; }
+                .land-b2 { width: 100px; height: 170px; background: var(--surface); --rs-awning: var(--gold); transform: rotate(1deg); z-index: 1; }
+                .land-b2 .window { top: 34px; left: 16px; }
+                .land-b2 .window:nth-child(3) { left: 62px; }
+                .land-b2 .window:nth-child(4) { top: 64px; left: 16px; }
+                .land-b2 .window:nth-child(5) { top: 64px; left: 62px; }
+                .land-b3 { width: 84px; height: 110px; background: var(--surface); --rs-awning: var(--success); transform: rotate(-0.5deg); }
+                .land-b3 .window { top: 40px; left: 14px; }
+                .land-b3 .window:nth-child(3) { left: 50px; }
+                .land-b-star {
                     position: absolute;
                     top: -14px; left: 50%;
                     transform: translateX(-50%);
                     color: var(--gold);
                     animation: rs-star-bob 2.6s ease-in-out infinite;
                 }
-                @keyframes rs-star-bob {
+                @keyframes star-bob {
                     0%, 100% { transform: translateX(-50%) translateY(0); }
                     50% { transform: translateX(-50%) translateY(-4px); }
                 }
                 @media (prefers-reduced-motion: reduce) {
-                    .rs-land-b-star { animation: none; }
+                    .land-b-star { animation: none; }
                 }
 
-                .rs-land-typewriter {
+                .land-typewriter {
                     max-width: 320px;
                     margin: 1rem auto 0;
                     text-align: center;
@@ -274,7 +274,7 @@ const LandingPage = () => {
                     color: var(--text-2);
                     min-height: 1.2em;
                 }
-                .rs-land-typewriter-cursor {
+                .land-typewriter-cursor {
                     display: inline-block;
                     width: 2px; height: 0.95em;
                     background: var(--accent);
@@ -282,53 +282,53 @@ const LandingPage = () => {
                     vertical-align: text-bottom;
                     animation: rs-cursor-blink 1s step-end infinite;
                 }
-                @keyframes rs-cursor-blink { 50% { opacity: 0; } }
+                @keyframes cursor-blink { 50% { opacity: 0; } }
 
                 /* ---------- Ticker (signature element) ---------- */
-                .rs-land-ticker {
+                .land-ticker {
                     background: var(--ink);
                     overflow: hidden;
                     padding: 1.1rem 0;
                     border-top: 1px solid rgba(230,236,244,0.1);
                     border-bottom: 1px solid rgba(230,236,244,0.1);
                 }
-                .rs-land-ticker-track {
+                .land-ticker-track {
                     display: flex;
                     width: max-content;
                     gap: 2.5rem;
                     animation: rs-ticker-scroll 32s linear infinite;
                 }
                 @media (prefers-reduced-motion: reduce) {
-                    .rs-land-ticker-track { animation: none; }
+                    .land-ticker-track { animation: none; }
                 }
                 @keyframes rs-ticker-scroll {
                     from { transform: translateX(0); }
                     to { transform: translateX(-50%); }
                 }
-                .rs-land-ticker-item {
+                .land-ticker-item {
                     display: flex;
                     align-items: baseline;
                     gap: 0.55rem;
                     white-space: nowrap;
                     font-size: 0.85rem;
                 }
-                .rs-land-ticker-name { color: #E6ECF4; font-weight: 600; }
-                .rs-land-ticker-city { color: #7C8AA0; font-size: 0.78rem; }
-                .rs-land-ticker-rating {
+                .land-ticker-name { color: #E6ECF4; font-weight: 600; }
+                .land-ticker-city { color: #7C8AA0; font-size: 0.78rem; }
+                .land-ticker-rating {
                     font-family: var(--font-mono);
                     color: #E7B95C;
                     font-weight: 500;
                 }
-                .rs-land-ticker-divider { color: #3A4A5E; }
+                .land-ticker-divider { color: #3A4A5E; }
 
                 /* ---------- Sections ---------- */
-                .rs-land-section {
+                .land-section {
                     max-width: 1200px;
                     margin: 0 auto;
                     padding: 4.5rem 3rem;
                 }
-                .rs-land-section-head { margin-bottom: 2.75rem; max-width: 480px; }
-                .rs-land-section-head span {
+                .land-section-head { margin-bottom: 2.75rem; max-width: 480px; }
+                .land-section-head span {
                     display: block;
                     font-family: var(--font-mono);
                     font-size: 0.72rem;
@@ -337,51 +337,51 @@ const LandingPage = () => {
                     color: var(--text-3);
                     margin-bottom: 0.6rem;
                 }
-                .rs-land-section-head h2 {
+                .land-section-head h2 {
                     font-family: var(--font-display);
                     font-weight: 500;
                     font-size: 1.9rem;
                     color: var(--ink);
                     margin: 0 0 0.6rem;
                 }
-                .rs-land-section-head p { color: var(--text-2); font-size: 0.98rem; margin: 0; }
+                .land-section-head p { color: var(--text-2); font-size: 0.98rem; margin: 0; }
 
                 /* ---------- Roles: asymmetric bento ---------- */
-                .rs-land-bento {
+                .land-bento {
                     display: grid;
                     grid-template-columns: 1.3fr 1fr;
                     grid-template-rows: repeat(2, 1fr);
                     gap: 1.1rem;
                 }
-                .rs-land-bento-card {
+                .land-bento-card {
                     background: var(--surface);
                     border: 1px solid var(--border-soft);
                     border-radius: var(--radius);
                     padding: 1.85rem;
                     box-shadow: var(--shadow-card);
                 }
-                .rs-land-bento-card.large { grid-row: 1 / 3; display: flex; flex-direction: column; justify-content: center; }
-                .rs-land-bento-icon {
+                .land-bento-card.large { grid-row: 1 / 3; display: flex; flex-direction: column; justify-content: center; }
+                .land-bento-icon {
                     width: 40px; height: 40px;
                     border-radius: var(--radius-sm);
                     display: flex; align-items: center; justify-content: center;
                     margin-bottom: 1rem;
                 }
-                .rs-land-bento-card h3 {
+                .land-bento-card h3 {
                     font-family: var(--font-display);
                     font-weight: 500;
                     font-size: 1.1rem;
                     color: var(--ink);
                     margin: 0 0 0.5rem;
                 }
-                .rs-land-bento-card p { font-size: 0.87rem; color: var(--text-2); line-height: 1.55; margin: 0 0 1rem; }
-                .rs-land-bento-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
-                .rs-land-bento-list li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: var(--text-2); }
-                .rs-land-bento-list svg { color: var(--accent); flex-shrink: 0; }
+                .land-bento-card p { font-size: 0.87rem; color: var(--text-2); line-height: 1.55; margin: 0 0 1rem; }
+                .land-bento-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+                .land-bento-list li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; color: var(--text-2); }
+                .land-bento-list svg { color: var(--accent); flex-shrink: 0; }
 
                 /* ---------- CTA: stamp ---------- */
-                .rs-land-cta-wrap { max-width: 1200px; margin: 0 auto; padding: 0 3rem 5rem; }
-                .rs-land-cta {
+                .land-cta-wrap { max-width: 1200px; margin: 0 auto; padding: 0 3rem 5rem; }
+                .land-cta {
                     background: var(--ink);
                     border-radius: var(--radius);
                     padding: 2.75rem 3rem;
@@ -391,15 +391,15 @@ const LandingPage = () => {
                     gap: 2rem;
                     flex-wrap: wrap;
                 }
-                .rs-land-cta h2 {
+                .land-cta h2 {
                     font-family: var(--font-display);
                     font-weight: 500;
                     color: #F1F4F8;
                     font-size: 1.5rem;
                     margin: 0 0 0.4rem;
                 }
-                .rs-land-cta p { color: #B7C2D0; margin: 0; font-size: 0.92rem; }
-                .rs-land-cta-btn {
+                .land-cta p { color: #B7C2D0; margin: 0; font-size: 0.92rem; }
+                .land-cta-btn {
                     position: relative;
                     background: #E7B95C;
                     color: var(--ink);
@@ -415,7 +415,7 @@ const LandingPage = () => {
                     white-space: nowrap;
                     transition: opacity 0.15s ease;
                 }
-                .rs-land-cta-btn::before, .rs-land-cta-btn::after {
+                .land-cta-btn::before, .land-cta-btn::after {
                     content: '';
                     position: absolute;
                     top: 50%;
@@ -424,12 +424,12 @@ const LandingPage = () => {
                     border-radius: 50%;
                     transform: translateY(-50%);
                 }
-                .rs-land-cta-btn::before { left: -5px; }
-                .rs-land-cta-btn::after { right: -5px; }
-                .rs-land-cta-btn:hover { opacity: 0.9; }
+                .land-cta-btn::before { left: -5px; }
+                .land-cta-btn::after { right: -5px; }
+                .land-cta-btn:hover { opacity: 0.9; }
 
                 /* ---------- Footer ---------- */
-                .rs-land-footer {
+                .land-footer {
                     border-top: 1px solid var(--border-soft);
                     padding: 1.75rem 3rem;
                     text-align: center;
@@ -438,119 +438,119 @@ const LandingPage = () => {
                 }
 
                 @media (max-width: 860px) {
-                    .rs-land-hero { grid-template-columns: 1fr; padding: 2.5rem 1.5rem 2.5rem; }
-                    .rs-land-hero h1 { font-size: 2.4rem; }
-                    .rs-land-nav { padding: 1.25rem 1.5rem; }
-                    .rs-land-section { padding: 3rem 1.5rem; }
-                    .rs-land-bento { grid-template-columns: 1fr; grid-template-rows: none; }
-                    .rs-land-bento-card.large { grid-row: auto; }
-                    .rs-land-cta { padding: 2rem; flex-direction: column; text-align: center; }
-                    .rs-land-cta-wrap { padding: 0 1.5rem 3.5rem; }
+                    .land-hero { grid-template-columns: 1fr; padding: 2.5rem 1.5rem 2.5rem; }
+                    .land-hero h1 { font-size: 2.4rem; }
+                    .land-nav { padding: 1.25rem 1.5rem; }
+                    .land-section { padding: 3rem 1.5rem; }
+                    .land-bento { grid-template-columns: 1fr; grid-template-rows: none; }
+                    .land-bento-card.large { grid-row: auto; }
+                    .land-cta { padding: 2rem; flex-direction: column; text-align: center; }
+                    .land-cta-wrap { padding: 0 1.5rem 3.5rem; }
                 }
             `}</style>
 
             {/* ---------- Nav ---------- */}
-            <nav className="rs-land-nav">
-                <div className="rs-land-nav-brand">
+            <nav className="land-nav">
+                <div className="land-nav-brand">
                     <IconSeal width={22} height={22} />
                     RateStore
                 </div>
-                <div className="rs-land-nav-actions">
+                <div className="land-nav-actions">
                 
                 </div>
             </nav>
 
             {/* ---------- Hero ---------- */}
-            <header className="rs-land-hero">
+            <header className="land-hero">
                 <div>
                     <h1>Know which stores<br /><em>actually</em> deliver.</h1>
-                    <p className="rs-land-hero-sub">
+                    <p className="land-hero-sub">
                         RateStore connects users, store owners, and admins on one platform 
                         browse stores, leave honest ratings, and track performance in real time.
                     </p>
-                    <div className="rs-land-hero-actions">
-                        <button className="rs-land-btn-primary" onClick={() => navigate('/signup')}>
+                    <div className="land-hero-actions">
+                        <button className="land-btn-primary" onClick={() => navigate('/signup')}>
                             Create your account <IconArrowRight width={16} height={16} />
                         </button>
-                        <button className="rs-land-btn-ghost" onClick={() => navigate('/login')}>
+                        <button className="land-btn-ghost" onClick={() => navigate('/login')}>
                             Sign in
                         </button>
                     </div>
                 </div>
 
                 <div>
-                    <div className="rs-land-storefronts">
-                        <div className="rs-land-building rs-land-b1">
+                    <div className="land-storefronts">
+                        <div className="land-building rs-land-b1">
                             <span className="window" />
                             <span className="window" />
                             <span className="door" />
                         </div>
-                        <div className="rs-land-building rs-land-b2">
-                            <IconStar filled width={16} height={16} className="rs-land-b-star" />
+                        <div className="land-building rs-land-b2">
+                            <IconStar filled width={16} height={16} className="land-b-star" />
                             <span className="window" />
                             <span className="window" />
                             <span className="window" />
                             <span className="window" />
                             <span className="door" />
                         </div>
-                        <div className="rs-land-building rs-land-b3">
+                        <div className="land-building land-b3">
                             <span className="window" />
                             <span className="window" />
                             <span className="door" />
                         </div>
                     </div>
-                    <div className="rs-land-typewriter">
+                    <div className="land-typewriter">
                         {typedRating}
-                        <span className="rs-land-typewriter-cursor" />
+                        <span className="land-typewriter-cursor" />
                     </div>
                 </div>
             </header>
 
             {/* ---------- Ticker ---------- */}
-            <div className="rs-land-ticker">
-                <div className="rs-land-ticker-track">
+            <div className="land-ticker">
+                <div className="land-ticker-track">
                     {[...TICKER_ITEMS, ...TICKER_ITEMS].map((s, i) => (
-                        <div className="rs-land-ticker-item" key={i}>
-                            <span className="rs-land-ticker-name">{s.name}</span>
-                            <span className="rs-land-ticker-city">{s.city}</span>
-                            <span className="rs-land-ticker-rating">★ {s.rating}</span>
-                            <span className="rs-land-ticker-divider">/</span>
+                        <div className="land-ticker-item" key={i}>
+                            <span className="land-ticker-name">{s.name}</span>
+                            <span className="land-ticker-city">{s.city}</span>
+                            <span className="land-ticker-rating">★ {s.rating}</span>
+                            <span className="land-ticker-divider">/</span>
                         </div>
                     ))}
                 </div>
             </div>
 
             {/* ---------- Roles ---------- */}
-            <section className="rs-land-section">
-                <div className="rs-land-section-head">
+            <section className="land-section">
+                <div className="land-section-head">
                     <span>Who it's for</span>
                     <h2>One platform, three roles</h2>
                     <p>Whether you're browsing, running a store, or managing the platform RateStore fits how you work.</p>
                 </div>
-                <div className="rs-land-bento">
-                    <div className="rs-land-bento-card large">
-                        <div className="rs-land-bento-icon" style={{ background: 'var(--accent-tint)', color: 'var(--accent-dark)' }}>
+                <div className="land-bento">
+                    <div className="land-bento-card large">
+                        <div className="land-bento-icon" style={{ background: 'var(--accent-tint)', color: 'var(--accent-dark)' }}>
                             <IconUsers width={20} height={20} />
                         </div>
                         <h3>For Users</h3>
                         <p>Search stores by name or address, and rate the ones you visit.</p>
-                        <ul className="rs-land-bento-list">
+                        <ul className="land-bento-list">
                             <li><IconCheck width={14} height={14} /> Browse every registered store</li>
                             <li><IconCheck width={14} height={14} /> Submit or update your rating anytime</li>
                             <li><IconCheck width={14} height={14} /> See what others are saying</li>
                         </ul>
                     </div>
 
-                    <div className="rs-land-bento-card">
-                        <div className="rs-land-bento-icon" style={{ background: 'var(--gold-tint)', color: 'var(--gold)' }}>
+                    <div className="land-bento-card">
+                        <div className="land-bento-icon" style={{ background: 'var(--gold-tint)', color: 'var(--gold)' }}>
                             <IconStorefront width={20} height={20} />
                         </div>
                         <h3>For Store Owners</h3>
                         <p>Track your live average rating and see who rated you.</p>
                     </div>
 
-                    <div className="rs-land-bento-card">
-                        <div className="rs-land-bento-icon" style={{ background: 'var(--success-tint)', color: 'var(--success)' }}>
+                    <div className="land-bento-card">
+                        <div className="land-bento-icon" style={{ background: 'var(--success-tint)', color: 'var(--success)' }}>
                             <IconSeal width={20} height={20} />
                         </div>
                         <h3>For Admins</h3>
@@ -560,19 +560,19 @@ const LandingPage = () => {
             </section>
 
             {/* ---------- CTA ---------- */}
-            <div className="rs-land-cta-wrap">
-                <section className="rs-land-cta">
+            <div className="land-cta-wrap">
+                <section className="land-cta">
                     <div>
                         <h2>Ready to join RateStore?</h2>
                         <p>It takes less than a minute to create your account.</p>
                     </div>
-                    <button className="rs-land-cta-btn" onClick={() => navigate('/signup')}>
+                    <button className="land-cta-btn" onClick={() => navigate('/signup')}>
                         Get started <IconArrowRight width={16} height={16} />
                     </button>
                 </section>
             </div>
 
-            <footer className="rs-land-footer">
+            <footer className="land-footer">
                 © 2026 Store Rating Platform. All rights reserved by Khushi Samundre. 
             </footer>
         </div>
